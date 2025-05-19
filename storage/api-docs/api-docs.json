@@ -1,0 +1,30 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Test controller",
+        "description": "API di test",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/test": {
+            "get": {
+                "tags": [
+                    "Tests"
+                ],
+                "summary": "test endpoint",
+                "operationId": "1275592e247e07a02fa2929d6bf90873",
+                "responses": {
+                    "200": {
+                        "description": "Risposta dal test"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Tests",
+            "description": "Tests"
+        }
+    ]
+}
