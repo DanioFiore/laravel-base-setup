@@ -10,13 +10,60 @@ use Illuminate\Http\JsonResponse;
 class AdminsController extends Controller
 {
     /**
-     * Retrieve all admin users.
-     *
-     * This method fetches all users with admin privileges from the database.
-     * Uses the ApiResponse::handle helper to standardize response format and handle exceptions.
-     *
-     * @return \Illuminate\Http\JsonResponse A JSON response containing a list of admin users
-     * @throws \Exception If an error occurs during the retrieval process
+     * @OA\Get(
+     *     path="/api/admins",
+     *     summary="List admin users",
+     *     description="Retrieves a list of all users who are administrators. Requires admin privileges.",
+     *     operationId="listAdmins",
+     *     tags={"Admin"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved list of admin users",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     description="Admin user details",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Admin User"),
+     *                     @OA\Property(property="email", type="string", format="email", example="admin@example.com")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You do not have permission to perform this action")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function index(): JsonResponse
     {
@@ -33,15 +80,91 @@ class AdminsController extends Controller
     }
 
     /**
-     * Update the admin status of a user.
-     *
-     * This method handles updating the admin privileges of a user in the system.
-     * It requires the authenticated user to have admin privileges to perform this action.
-     * 
-     * @param  \Illuminate\Http\Request  $request  The HTTP request containing user ID and admin status
-     * @throws \Illuminate\Validation\ValidationException  If validation fails
-     * @throws \Exception  If the authenticated user is not an admin
-     * @return \Illuminate\Http\JsonResponse  Response indicating success or failure
+     * @OA\Patch(
+     *     path="/api/users/{id}",
+     *     summary="Update user admin status",
+     *     description="Updates the 'is_admin' status of a specific user identified by ID. Requires admin privileges.",
+     *     operationId="updateUserAdminStatus",
+     *     tags={"Admin"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user whose admin status is to be updated",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="New admin status",
+     *         @OA\JsonContent(
+     *             required={"is_admin"},
+     *             @OA\Property(property="is_admin", type="boolean", example=true, description="Set to true for admin, false for regular user")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Admin status updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="Admin status updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="is_admin",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The is admin field must be true or false.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You do not have permission to perform this action")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function update(Request $request, int $id): JsonResponse
     {

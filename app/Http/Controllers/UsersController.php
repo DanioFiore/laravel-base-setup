@@ -14,12 +14,41 @@ use Illuminate\Validation\ValidationException;
 class UsersController extends Controller
 {
     /**
-     * Retrieve all users.
-     *
-     * This method fetches all users from the database and returns them
-     * in a JSON response using the ApiResponse handler.
-     *
-     * @return \Illuminate\Http\JsonResponse JSON response containing all users data
+     * @OA\Get(
+     *     path="/api/users",
+     *     summary="List all users",
+     *     description="Retrieves a list of all users.",
+     *     operationId="listUsers",
+     *     tags={"Users"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved list of users",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     description="User details",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function index(): JsonResponse
     {
@@ -30,16 +59,85 @@ class UsersController extends Controller
     }
 
     /**
-     * Display the specified user.
-     * 
-     * This method retrieves a specific user by ID. It performs validation to ensure
-     * the ID is valid and exists in the database. It also checks that the authenticated
-     * user is only viewing their own profile for security purposes.
-     *
-     * @param  int  $id  The ID of the user to retrieve
-     * @return \Illuminate\Http\JsonResponse A JSON response containing the user data
-     * @throws \Illuminate\Validation\ValidationException If validation fails
-     * @throws \Exception If the authenticated user tries to view another user's profile
+     * @OA\Get(
+     *     path="/api/users/{id}",
+     *     summary="Get user details",
+     *     description="Retrieves details for a specific user by ID. Requires authentication. Users can view their own profile or, if admin, any user's profile.",
+     *     operationId="showUser",
+     *     tags={"Users"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to retrieve",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully retrieved user details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 description="User details",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You cannot view other users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function show(int $id): JsonResponse
     {
@@ -64,19 +162,97 @@ class UsersController extends Controller
     }
 
     /**
-     * Update a user's information.
-     *
-     * This method allows a user to update their name and/or email.
-     * It validates the request, ensures users can only update their own profile,
-     * and then applies the changes to the database.
-     *
-     * @param  \Illuminate\Http\Request  $request  The request object containing 
-     *                                             'id' (required),
-     *                                             'name' (optional),
-     *                                             'email' (optional)
-     * @return \Illuminate\Http\JsonResponse       JSON response with success message or error details
-     * @throws \Illuminate\Validation\ValidationException  When validation fails
-     * @throws \Exception  When a user attempts to update another user's profile or no fields to update are provided
+     * @OA\Patch(
+     *     path="/api/users",
+     *     summary="Update user details",
+     *     description="Updates details for a specific user by ID provided in the request body. Authenticated users can update their own profile; admins can update any user's profile.",
+     *     operationId="updateUser",
+     *     tags={"Users"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User details to update",
+     *         @OA\JsonContent(
+     *             required={"id"},
+     *             @OA\Property(property="id", type="integer", example=1, description="ID of the user to update"),
+     *             @OA\Property(property="name", type="string", nullable=true, example="Jane Doe", description="New name for the user (optional)"),
+     *             @OA\Property(property="email", type="string", format="email", nullable=true, example="jane.doe@example.com", description="New email for the user (optional)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="User updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="name",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The name field must be a string.")
+     *                 ),
+     *                  @OA\Property(
+     *                     property="email",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The email field must be a valid email address.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad Request - No fields to update or other client errors",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="No fields to update")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You cannot update other users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function update(Request $request): JsonResponse
     {
@@ -117,17 +293,78 @@ class UsersController extends Controller
     }
 
     /**
-     * Soft deletes a user.
-     * 
-     * This method handles the soft deletion of a user identified by their ID. It performs the following steps:
-     * 1. Validates that the given ID is a valid user ID in the database
-     * 2. Checks that the authenticated user has permission to delete the user (must be admin or the same user)
-     * 3. Finds the user and soft deletes it
-     * 
-     * @param int $id The ID of the user to be soft deleted
-     * @return \Illuminate\Http\JsonResponse A JSON response indicating success or failure
-     * @throws \Illuminate\Validation\ValidationException When validation fails
-     * @throws \Exception When user tries to delete another user without admin privileges
+     * @OA\Delete(
+     *     path="/api/users/{id}",
+     *     summary="Soft delete a user",
+     *     description="Soft deletes a user by ID. Authenticated users can soft delete their own profile; admins can soft delete any user's profile.",
+     *     operationId="softDeleteUser",
+     *     tags={"Users"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to soft delete",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User soft-deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="User soft-deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You cannot delete other users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function softDestroy(int $id): JsonResponse
     {
@@ -153,17 +390,78 @@ class UsersController extends Controller
     }
 
     /**
-     * Restores a soft-deleted user.
-     * 
-     * This method handles the restoration of a soft-deleted user identified by their ID. It performs the following steps:
-     * 1. Validates that the given ID is a valid user ID in the database
-     * 2. Checks that the authenticated user has permission to restore the user (must be admin or the same user)
-     * 3. Finds the user and restores it
-     * 
-     * @param int $id The ID of the user to be restored
-     * @return \Illuminate\Http\JsonResponse A JSON response indicating success or failure
-     * @throws \Illuminate\Validation\ValidationException When validation fails
-     * @throws \Exception When user tries to restore another user without admin privileges
+     * @OA\Patch(
+     *     path="/api/users/{id}/restore",
+     *     summary="Restore a soft-deleted user",
+     *     description="Restores a soft-deleted user by ID. Requires authentication. Authenticated users can only restore their own soft-deleted profile.",
+     *     operationId="restoreUser",
+     *     tags={"Users"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the soft-deleted user to restore",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User restored successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="User restored successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You cannot restore other users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function restore(int $id): JsonResponse
     {
@@ -189,17 +487,78 @@ class UsersController extends Controller
     }
 
     /**
-     * Permanently deletes a user.
-     * 
-     * This method handles the permanent deletion of a user identified by their ID. It performs the following steps:
-     * 1. Validates that the given ID is a valid user ID in the database
-     * 2. Checks that the authenticated user has permission to delete the user (must be admin or the same user)
-     * 3. Finds the user and permanently deletes it
-     * 
-     * @param int $id The ID of the user to be permanently deleted
-     * @return \Illuminate\Http\JsonResponse A JSON response indicating success or failure
-     * @throws \Illuminate\Validation\ValidationException When validation fails
-     * @throws \Exception When user tries to delete another user without admin privileges
+     * @OA\Delete(
+     *     path="/api/users/{id}/force-delete",
+     *     summary="Permanently delete a user",
+     *     description="Permanently deletes a user by ID, including soft-deleted users. Authenticated users can permanently delete their own profile; admins can permanently delete any user's profile.",
+     *     operationId="forceDeleteUser",
+     *     tags={"Users"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the user to permanently delete (can be soft-deleted)",
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User permanently deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="User permanently deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="id",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected id is invalid.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User does not have permission",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="You cannot delete other users")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function destroy(int $id): JsonResponse
     {

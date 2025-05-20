@@ -15,20 +15,71 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Registers a new user in the system.
-     *
-     * This method validates the input data, creates a new user with the provided information,
-     * and returns the user's name and email upon successful registration.
-     *
-     * @param \Illuminate\Http\Request $request The HTTP request containing user registration data
-     * @return \Illuminate\Http\JsonResponse JSON response with user data or validation errors
-     * @throws \Illuminate\Validation\ValidationException When validation fails
-     *
-     * Required request parameters:
-     * - name: The user's full name
-     * - email: A valid email address
-     * - password: The user's chosen password
-     * - confirmPassword: Password confirmation (must match password)
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="Register a new user",
+     *     description="Registers a new user and returns their details and an API token.",
+     *     operationId="registerUser",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User registration details",
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password", "confirmPassword"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="confirmPassword", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User successfully registered",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *                 @OA\Property(property="token", type="string", example="1|abcdefg12345...")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The email has already been taken.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="confirmPassword",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The confirm password and password must match.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function register(Request $request): JsonResponse
     {
@@ -60,15 +111,84 @@ class AuthController extends Controller
     }
 
     /**
-     * Handles user login authentication.
-     *
-     * This method validates the incoming login request, checks user credentials,
-     * and generates an authentication token upon successful login.
-     *
-     * @param \Illuminate\Http\Request $request The HTTP request containing user credentials
-     * @return \Illuminate\Http\JsonResponse JSON response with user data and token or error message
-     * @throws \Illuminate\Validation\ValidationException When validation fails
-     * @throws \Exception When credentials are invalid
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Authenticate user",
+     *     description="Authenticates a user with email and password and returns user data and an API token.",
+     *     operationId="loginUser",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="User login credentials",
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User successfully authenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     description="Authenticated user details",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
+     *                 ),
+     *                 @OA\Property(property="token", type="string", example="1|abcdefg12345...")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="email",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The selected email is invalid.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The password field is required.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid credentials",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Invalid credentials")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function login(Request $request): JsonResponse
     {
@@ -102,14 +222,50 @@ class AuthController extends Controller
     }
 
     /**
-     * Handles user logout by revoking the current access token.
-     *
-     * This method retrieves the authenticated user from the request,
-     * checks if they are authenticated, and then revokes their current
-     * access token, effectively logging them out of the system.
-     *
-     * @return \Illuminate\Http\JsonResponse A JSON response indicating logout success or error.
-     * @throws \Exception If the user is not authenticated.
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Logout user",
+     *     description="Logs out the currently authenticated user by revoking their access token.",
+     *     operationId="logoutUser",
+     *     tags={"Auth"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successfully logged out",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="success"),
+     *             @OA\Property(property="data", type="string", example="Logged out successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *      @OA\Response(
+     *         response=403,
+     *         description="Forbidden - User not authenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="User not authenticated")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="string", example="error"),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function logout(): JsonResponse
     {
