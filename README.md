@@ -1,112 +1,85 @@
-# Invent-AI | Gestione dell'inventario intelligente
+# Invent-AI | Manage your inventory in a smarte way
 
-Software di gestione dell'inventario pensato per le piccole e grandi aziende.
+Software to manage your inventory with AI features.
 
-## Indice
+## Summary
 
-- [Requisiti](#requisiti)
-- [Installazione](#installazione)
-- [Configurazione](#configurazione)
-- [Uso](#uso)
-- [API Documentation con Swagger](#api-documentation-con-swagger)
-- [Esempi di Annotations per Swagger](#esempi-di-annotations-per-swagger)
+- [Requirements](#requirements)
+- [Installation](#Installation)
+- [Setup](#Setup)
+- [How to use](#how-to-use)
+- [API Documentation with Swagger](#api-documentation-with-swagger)
+- [Annotations examples for Swagger](#annotations-examples-for-swagger)
 - [Testing](#testing)
 - [License](#license)
 
-## Requisiti
+## Requirements
 
-Totalmente Dockerizzato
+The software is completely dockerized, no needs of complex requirements, setup etc..
 
-## Installazione
+## Installation
 
-1. Clona il repository:
+1. Clone the repository:
    ```bash
    git clone https://github.com/DanioFiore/invent-ai.git
    cd invent-ai
    ```
 
-2. Lancia il run.sh:
+2. Run the run.sh, it will install everything you need:
    ```bash
    ./run.sh
    ```
 
-3. Installa le dipendenze JavaScript e PHP:
+3. Install dependencies:
    ```bash
    composer install
-   npm install && npm run dev
+   npm install
    ```
 
-4. Copia il file di ambiente e configuralo:
+4. Copy the .env file and configure it:
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-5. Configura il tuo database nel file `.env`
-
-6. Esegui le migrazioni:
+5. Run migrations:
    ```bash
    php artisan migrate
    ```
 
-## Configurazione
+## Setup
 
-### Configurazione del database
+### L5-Swagger
 
-Modifica il file `.env` per impostare le credenziali del database:
-
-```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=invent-ai
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-### Configurazione di L5-Swagger
-
-Installa il pacchetto L5-Swagger per la documentazione API:
-
-```bash
-composer require darkaonline/l5-swagger
-```
-
-Pubblica i file di configurazione:
+We use Swagger for the documentation. Publish the files:
 
 ```bash
 php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
 ```
 
-Modifica il file `config/l5-swagger.php` per personalizzare la configurazione.
+Edit the file `config/l5-swagger.php` to customize the configuration.
 
-## Uso
+## How to use
 
-Per avviare il server di sviluppo:
+By running the run.sh, you already start the server and you will be in the container bash
 
-```bash
-php artisan serve
-```
+You can visit the app at: http://localhost:8080
 
-L'applicazione sarà accessibile all'indirizzo: http://localhost:8000
+## API Documentation with Swagger
 
-## API Documentation con Swagger
-
-La documentazione API è generata automaticamente utilizzando L5-Swagger. Per generare la documentazione:
+The Swagger documentation is automatically generated thanks to the .env configuration. To generate the docs manually:
 
 ```bash
 php artisan l5-swagger:generate
 ```
 
-La documentazione sarà disponibile all'indirizzo: http://localhost:8000/api/documentation
+You can see the documentation at: http://localhost:8080/api/documentation
 
-Se riscontri l'errore `Required @OA\PathItem() not found`, assicurati di aver aggiunto correttamente le annotazioni OpenAPI nei tuoi controller.
+If you have error `Required @OA\PathItem() not found`, be sure to have writed correctly the Swagger annotations in your controller
 
-## Esempi di Annotations per Swagger
+## Annotations examples for Swagger
 
-Di seguito sono riportati esempi di come scrivere le annotazioni OpenAPI per generare la documentazione Swagger.
-
-### Annotazione di base del Controller
+### Controller base annotation
 
 ```php
 /**
@@ -130,7 +103,7 @@ class InventoryController extends Controller
 }
 ```
 
-### Annotazione per un endpoint GET
+### Annotation for GET endpoint
 
 ```php
 /**
@@ -164,7 +137,7 @@ public function index()
 }
 ```
 
-### Annotazione per un endpoint POST
+### Annotation for POST endpoint
 
 ```php
 /**
@@ -202,7 +175,7 @@ public function store(Request $request)
 }
 ```
 
-### Annotazione per un endpoint PUT/PATCH
+### Annotation for PUT/PATCH endpoint
 
 ```php
 /**
@@ -250,7 +223,7 @@ public function update(Request $request, $id)
 }
 ```
 
-### Annotazione per un endpoint DELETE
+### Annotation for DELETE endpoint
 
 ```php
 /**
@@ -283,7 +256,7 @@ public function destroy($id)
 }
 ```
 
-### Definizione di uno Schema
+### Definition of a Schema
 
 ```php
 /**
@@ -338,7 +311,7 @@ public function destroy($id)
  */
 ```
 
-### Annotazione per QueryParams
+### QueryParams annotations
 
 ```php
 /**
@@ -394,7 +367,7 @@ public function search(Request $request)
 
 ## Testing
 
-Per eseguire i test:
+To execute tests:
 
 ```bash
 php artisan test
@@ -402,4 +375,4 @@ php artisan test
 
 ## License
 
-Questo progetto è rilasciato sotto licenza MIT. Vedi il file [LICENSE](LICENSE) per i dettagli. 
+This project is released under MIT license. See file [LICENSE](LICENSE) for details. 
