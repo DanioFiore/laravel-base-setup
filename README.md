@@ -1,4 +1,4 @@
-# Invent-AI | Manage your inventory in a smarte way
+# Invent-AI | Manage your inventory in a smarter way
 
 Software to manage your inventory with AI features.
 
