@@ -15,7 +15,7 @@
         }
     ],
     "paths": {
-        "/api/admins": {
+        "/v1/admins": {
             "get": {
                 "tags": [
                     "Admin"
@@ -130,7 +130,7 @@
                 ]
             }
         },
-        "/api/users/{id}": {
+        "/v1/users/{id}": {
             "get": {
                 "tags": [
                     "Users"
@@ -592,7 +592,7 @@
                 ]
             }
         },
-        "/api/register": {
+        "/v1/register": {
             "post": {
                 "tags": [
                     "Auth"
@@ -735,7 +735,7 @@
                 }
             }
         },
-        "/api/login": {
+        "/v1/login": {
             "post": {
                 "tags": [
                     "Auth"
@@ -897,7 +897,7 @@
                 }
             }
         },
-        "/api/logout": {
+        "/v1/logout": {
             "post": {
                 "tags": [
                     "Auth"
@@ -994,7 +994,7 @@
                 ]
             }
         },
-        "/api/test": {
+        "/v1/test": {
             "get": {
                 "tags": [
                     "Test"
@@ -1046,7 +1046,7 @@
                 }
             }
         },
-        "/api/users": {
+        "/v1/users": {
             "get": {
                 "tags": [
                     "Users"
@@ -1311,7 +1311,7 @@
                 ]
             }
         },
-        "/api/users/{id}/restore": {
+        "/v1/users/{id}/restore": {
             "patch": {
                 "tags": [
                     "Users"
@@ -1452,7 +1452,7 @@
                 ]
             }
         },
-        "/api/users/{id}/force-delete": {
+        "/v1/users/{id}/force-delete": {
             "delete": {
                 "tags": [
                     "Users"

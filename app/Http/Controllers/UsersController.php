@@ -15,7 +15,7 @@ class UsersController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/users",
+     *     path="/v1/users",
      *     summary="List all users",
      *     description="Retrieves a list of all users.",
      *     operationId="listUsers",
@@ -60,7 +60,7 @@ class UsersController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/users/{id}",
+     *     path="/v1/users/{id}",
      *     summary="Get user details",
      *     description="Retrieves details for a specific user by ID. Requires authentication. Users can view their own profile or, if admin, any user's profile.",
      *     operationId="showUser",
@@ -163,7 +163,7 @@ class UsersController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/api/users",
+     *     path="/v1/users",
      *     summary="Update user details",
      *     description="Updates details for a specific user by ID provided in the request body. Authenticated users can update their own profile; admins can update any user's profile.",
      *     operationId="updateUser",
@@ -294,7 +294,7 @@ class UsersController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/users/{id}",
+     *     path="/v1/users/{id}",
      *     summary="Soft delete a user",
      *     description="Soft deletes a user by ID. Authenticated users can soft delete their own profile; admins can soft delete any user's profile.",
      *     operationId="softDeleteUser",
@@ -391,7 +391,7 @@ class UsersController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/api/users/{id}/restore",
+     *     path="/v1/users/{id}/restore",
      *     summary="Restore a soft-deleted user",
      *     description="Restores a soft-deleted user by ID. Requires authentication. Authenticated users can only restore their own soft-deleted profile.",
      *     operationId="restoreUser",
@@ -488,7 +488,7 @@ class UsersController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/users/{id}/force-delete",
+     *     path="/v1/users/{id}/force-delete",
      *     summary="Permanently delete a user",
      *     description="Permanently deletes a user by ID, including soft-deleted users. Authenticated users can permanently delete their own profile; admins can permanently delete any user's profile.",
      *     operationId="forceDeleteUser",

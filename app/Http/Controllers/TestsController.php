@@ -9,7 +9,7 @@ class TestsController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/test",
+     *     path="/v1/test",
      *     summary="Test endpoint",
      *     description="A simple test endpoint to verify API functionality",
      *     operationId="testEndpoint",

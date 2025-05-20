@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/register",
+     *     path="/v1/register",
      *     summary="Register a new user",
      *     description="Registers a new user and returns their details and an API token.",
      *     operationId="registerUser",
@@ -112,7 +112,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/login",
+     *     path="/v1/login",
      *     summary="Authenticate user",
      *     description="Authenticates a user with email and password and returns user data and an API token.",
      *     operationId="loginUser",
@@ -223,7 +223,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/logout",
+     *     path="/v1/logout",
      *     summary="Logout user",
      *     description="Logs out the currently authenticated user by revoking their access token.",
      *     operationId="logoutUser",

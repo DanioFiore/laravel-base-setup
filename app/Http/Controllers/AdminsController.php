@@ -11,7 +11,7 @@ class AdminsController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/admins",
+     *     path="/v1/admins",
      *     summary="List admin users",
      *     description="Retrieves a list of all users who are administrators. Requires admin privileges.",
      *     operationId="listAdmins",
@@ -81,7 +81,7 @@ class AdminsController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/api/users/{id}",
+     *     path="/v1/users/{id}",
      *     summary="Update user admin status",
      *     description="Updates the 'is_admin' status of a specific user identified by ID. Requires admin privileges.",
      *     operationId="updateUserAdminStatus",
