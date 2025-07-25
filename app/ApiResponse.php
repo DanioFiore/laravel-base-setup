@@ -93,12 +93,17 @@ class ApiResponse
             ], $statusCode);
         }
         
-        return response()->json([
+        $response = [
             'status' => 'error',
             'message' => $genericMessage,
-            // if is a validation exception, include the errors
-            'errors' => method_exists($e, 'errors') ? $e->errors() : null
-        ], $statusCode);
+        ];
+        
+        // if is a validation exception, include the errors
+        if ($e instanceof ValidationException) {
+            $response['errors'] = $e->errors();
+        }
+        
+        return response()->json($response, $statusCode);
     }
 
 }
