@@ -1,378 +1,420 @@
-# Invent-AI | Manage your inventory in a smarter way
+# Laravel Base Setup
 
-Software to manage your inventory with AI features.
+A modern Laravel application starter template with **Laravel Octane**, **FrankenPHP**, **Docker**, and comprehensive development tools.
 
-## Summary
+**🎯 Ready-to-use features included:**
+- ✅ Complete authentication system (register/login/logout)
+- ✅ API documentation with Scramble (auto-generated)
+- ✅ Standardized API responses
+- ✅ Database migrations and user management
+
+## 🚀 Features
+
+- **Laravel 12** with the latest PHP 8.4
+- **Laravel Octane** with **FrankenPHP** for high-performance HTTP server
+- **Docker** containerization with Laravel Sail
+- **MySQL 8.0** database with PHPMyAdmin
+- **Redis** for caching and session storage
+- **Meilisearch** for full-text search capabilities
+- **Mailpit** for email testing and debugging
+- **✅ Laravel Sanctum** - Complete authentication system with login/register/logout endpoints **already implemented**
+- **✅ Scramble API Documentation** - Automatic OpenAPI documentation generation **pre-configured and ready**
+- **Vite** with TailwindCSS 4.0 for modern frontend development
+- **ApiResponse Helper** - Standardized API response formatting included
+- Pre-configured testing environment with PHPUnit
+
+## 📋 Summary
 
 - [Requirements](#requirements)
-- [Installation](#Installation)
-- [Setup](#Setup)
-- [How to use](#how-to-use)
-- [API Documentation with Swagger](#api-documentation-with-swagger)
-- [Annotations examples for Swagger](#annotations-examples-for-swagger)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Development](#development)
+- [API Documentation](#api-documentation)
 - [Testing](#testing)
+- [Services](#services)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
 - [License](#license)
 
-## Requirements
+## 🛠 Requirements
 
-The software is completely dockerized, no needs of complex requirements, setup etc..
+The project is fully containerized using Docker, so you only need:
 
-## Installation
+- **Docker** (version 20.10 or higher)
+- **Docker Compose** (version 2.0 or higher)
+- **Git**
 
-1. Clone the repository:
+No need for local PHP, MySQL, or other dependencies!
+
+## 📦 Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/DanioFiore/invent-ai.git
-   cd invent-ai
+   git clone <your-repository-url>
+   cd laravel-base-setup
    ```
 
-2. Run the run.sh, it will install everything you need:
+2. **Copy environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start the development environment:**
    ```bash
    ./run.sh
    ```
 
-3. Install dependencies:
+The `run.sh` script will:
+- Build and start all Docker containers
+- Set proper permissions
+- Enter the container bash automatically
+
+4. **Install dependencies (inside the container):**
    ```bash
    composer install
    npm install
    ```
 
-4. Copy the .env file and configure it:
+5. **Generate application key and run migrations:**
    ```bash
-   cp .env.example .env
    php artisan key:generate
-   ```
-
-5. Run migrations:
-   ```bash
    php artisan migrate
    ```
 
-## Setup
+   **Note:** The authentication system is ready to use immediately after migration! The included migrations set up:
+   - Users table with soft deletes
+   - Personal access tokens table (Sanctum)
+   - Admin user functionality
+   - Cache and jobs tables
 
-### L5-Swagger
+## ⚙️ Configuration
 
-We use Swagger for the documentation. Publish the files:
+### Environment Variables
+
+Key configuration options in `.env`:
+
+```env
+# Application
+APP_NAME=your-app-name
+APP_PORT=8080
+APP_DEBUG=true
+
+# Database
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_DATABASE=your-database
+DB_USERNAME=root
+DB_PASSWORD=your-password
+
+# FrankenPHP/Octane
+OCTANE_SERVER=frankenphp
+
+# Ports
+PHPMYADMIN_PORT=3000
+FORWARD_DB_PORT=3306
+FORWARD_REDIS_PORT=6379
+FORWARD_MEILISEARCH_PORT=7700
+```
+
+### FrankenPHP Configuration
+
+The application uses FrankenPHP as the Octane server for superior performance. Configuration is handled automatically through Docker Compose and Laravel Octane.
+
+## 🏃‍♂️ Usage
+
+### Starting the Application
 
 ```bash
-php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
+# Start all services
+./run.sh
+
+# Or manually with Docker Compose
+docker-compose up -d
+docker-compose exec laravel.test bash
 ```
 
-Edit the file `config/l5-swagger.php` to customize the configuration.
+### Accessing Services
 
-## How to use
+Once started, you can access:
 
-By running the run.sh, you already start the server and you will be in the container bash
+- **Laravel Application**: http://localhost:8080
+- **PHPMyAdmin**: http://localhost:3000
+- **Mailpit (Email Testing)**: http://localhost:8025
+- **Meilisearch**: http://localhost:7700
 
-You can visit the app at: http://localhost:8080
-
-## API Documentation with Swagger
-
-The Swagger documentation is automatically generated thanks to the .env configuration. To generate the docs manually:
+### Basic Commands
 
 ```bash
-php artisan l5-swagger:generate
+# Inside the container:
+
+# Start Octane with FrankenPHP (automatic with docker-compose)
+php artisan octane:start --server=frankenphp
+
+# Run migrations
+php artisan migrate
+
+# Seed database
+php artisan db:seed
+
+# Clear caches
+php artisan optimize:clear
+
+# Generate API documentation
+php artisan scramble:docs
 ```
 
-You can see the documentation at: http://localhost:8080/api/documentation
+## 👨‍💻 Development
 
-If you have error `Required @OA\PathItem() not found`, be sure to have writed correctly the Swagger annotations in your controller
+### Frontend Development
 
-## Annotations examples for Swagger
-
-### Controller base annotation
-
-```php
-/**
- * @OA\Info(
- *     title="API Gestione Inventario",
- *     version="1.0.0",
- *     description="API per il sistema di gestione dell'inventario",
- *     @OA\Contact(
- *         email="admin@example.com",
- *         name="Support Team"
- *     ),
- *     @OA\License(
- *         name="MIT",
- *         url="https://opensource.org/licenses/MIT"
- *     )
- * )
- */
-class InventoryController extends Controller
-{
-    // metodi del controller
-}
-```
-
-### Annotation for GET endpoint
-
-```php
-/**
- * @OA\Get(
- *     path="/api/products",
- *     summary="Ottieni tutti i prodotti",
- *     description="Restituisce un elenco di tutti i prodotti nell'inventario",
- *     operationId="getProductsList",
- *     tags={"Products"},
- *     @OA\Response(
- *         response=200,
- *         description="Operazione riuscita",
- *         @OA\JsonContent(
- *             type="array",
- *             @OA\Items(ref="#/components/schemas/Product")
- *         )
- *     ),
- *     @OA\Response(
- *         response=401,
- *         description="Non autorizzato"
- *     ),
- *     @OA\Response(
- *         response=403,
- *         description="Accesso negato"
- *     )
- * )
- */
-public function index()
-{
-    // implementazione
-}
-```
-
-### Annotation for POST endpoint
-
-```php
-/**
- * @OA\Post(
- *     path="/api/products",
- *     summary="Crea un nuovo prodotto",
- *     description="Crea e restituisce un nuovo prodotto",
- *     operationId="storeProduct",
- *     tags={"Products"},
- *     @OA\RequestBody(
- *         required=true,
- *         description="Dati del prodotto",
- *         @OA\JsonContent(
- *             required={"name","quantity","price"},
- *             @OA\Property(property="name", type="string", example="iPhone 13"),
- *             @OA\Property(property="description", type="string", example="Smartphone Apple"),
- *             @OA\Property(property="quantity", type="integer", example=10),
- *             @OA\Property(property="price", type="number", format="float", example=999.99)
- *         )
- *     ),
- *     @OA\Response(
- *         response=201,
- *         description="Prodotto creato con successo",
- *         @OA\JsonContent(ref="#/components/schemas/Product")
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Errore di validazione"
- *     )
- * )
- */
-public function store(Request $request)
-{
-    // implementazione
-}
-```
-
-### Annotation for PUT/PATCH endpoint
-
-```php
-/**
- * @OA\Put(
- *     path="/api/products/{id}",
- *     summary="Aggiorna un prodotto esistente",
- *     description="Aggiorna e restituisce un prodotto esistente",
- *     operationId="updateProduct",
- *     tags={"Products"},
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         description="ID del prodotto da aggiornare",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\RequestBody(
- *         required=true,
- *         description="Dati del prodotto aggiornati",
- *         @OA\JsonContent(
- *             @OA\Property(property="name", type="string", example="iPhone 13 Pro"),
- *             @OA\Property(property="description", type="string", example="Smartphone Apple Pro"),
- *             @OA\Property(property="quantity", type="integer", example=5),
- *             @OA\Property(property="price", type="number", format="float", example=1299.99)
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Prodotto aggiornato con successo",
- *         @OA\JsonContent(ref="#/components/schemas/Product")
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Prodotto non trovato"
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Errore di validazione"
- *     )
- * )
- */
-public function update(Request $request, $id)
-{
-    // implementazione
-}
-```
-
-### Annotation for DELETE endpoint
-
-```php
-/**
- * @OA\Delete(
- *     path="/api/products/{id}",
- *     summary="Elimina un prodotto",
- *     description="Elimina un prodotto dal database",
- *     operationId="deleteProduct",
- *     tags={"Products"},
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         description="ID del prodotto da eliminare",
- *         required=true,
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Response(
- *         response=204,
- *         description="Prodotto eliminato con successo"
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Prodotto non trovato"
- *     )
- * )
- */
-public function destroy($id)
-{
-    // implementazione
-}
-```
-
-### Definition of a Schema
-
-```php
-/**
- * @OA\Schema(
- *     schema="Product",
- *     required={"name", "quantity", "price"},
- *     @OA\Property(
- *         property="id",
- *         type="integer",
- *         format="int64",
- *         description="ID del prodotto",
- *         example=1
- *     ),
- *     @OA\Property(
- *         property="name",
- *         type="string",
- *         description="Nome del prodotto",
- *         example="Laptop Dell XPS 15"
- *     ),
- *     @OA\Property(
- *         property="description",
- *         type="string",
- *         description="Descrizione del prodotto",
- *         example="Laptop professionale con schermo 15 pollici"
- *     ),
- *     @OA\Property(
- *         property="quantity",
- *         type="integer",
- *         description="Quantità disponibile",
- *         example=20
- *     ),
- *     @OA\Property(
- *         property="price",
- *         type="number",
- *         format="float",
- *         description="Prezzo unitario",
- *         example=1499.99
- *     ),
- *     @OA\Property(
- *         property="created_at",
- *         type="string",
- *         format="date-time",
- *         description="Data di creazione"
- *     ),
- *     @OA\Property(
- *         property="updated_at",
- *         type="string",
- *         format="date-time",
- *         description="Data di ultimo aggiornamento"
- *     )
- * )
- */
-```
-
-### QueryParams annotations
-
-```php
-/**
- * @OA\Get(
- *     path="/api/products/search",
- *     summary="Cerca prodotti",
- *     description="Cerca prodotti per nome o categoria",
- *     operationId="searchProducts",
- *     tags={"Products"},
- *     @OA\Parameter(
- *         name="query",
- *         in="query",
- *         description="Termine di ricerca",
- *         required=false,
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Parameter(
- *         name="category",
- *         in="query",
- *         description="Filtra per categoria",
- *         required=false,
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Parameter(
- *         name="min_price",
- *         in="query",
- *         description="Prezzo minimo",
- *         required=false,
- *         @OA\Schema(type="number", format="float")
- *     ),
- *     @OA\Parameter(
- *         name="max_price",
- *         in="query",
- *         description="Prezzo massimo",
- *         required=false,
- *         @OA\Schema(type="number", format="float")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Elenco dei prodotti filtrati",
- *         @OA\JsonContent(
- *             type="array",
- *             @OA\Items(ref="#/components/schemas/Product")
- *         )
- *     )
- * )
- */
-public function search(Request $request)
-{
-    // implementazione
-}
-```
-
-## Testing
-
-To execute tests:
+The project uses Vite with TailwindCSS 4.0:
 
 ```bash
+# Start Vite development server (inside container)
+npm run dev
+
+# Build for production
+npm run build
+```
+
+### Database Management
+
+```bash
+# Create migration
+php artisan make:migration create_example_table
+
+# Create model with migration and factory
+php artisan make:model Example -mf
+
+# Run specific migration
+php artisan migrate --path=/database/migrations/specific_migration.php
+
+# Rollback migrations
+php artisan migrate:rollback
+```
+
+### API Development
+
+The starter **includes a complete authentication system ready to use**:
+
+✅ **Fully Implemented Features:**
+- User registration with validation
+- User login with credential verification  
+- User logout with token revocation
+- Laravel Sanctum token-based authentication
+- `ApiResponse` helper for consistent responses
+- Database migrations for users and tokens
+- Soft delete functionality for users
+- Admin user support
+
+```bash
+# Create additional API controllers
+php artisan make:controller Api/V1/ExampleController --api
+
+# Create API resources
+php artisan make:resource ExampleResource
+```
+
+**API Routes** are organized in:
+- `routes/api_v1.php` - Version 1 API routes (authentication included)
+- `routes/api.php` - General API routes
+
+**Authentication Usage Example:**
+```php
+// Protected route example
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});
+```
+
+## 📚 API Documentation
+
+This setup uses **Scramble** for automatic API documentation generation, which is **already configured and ready to use**.
+
+### Accessing Documentation
+
+- **Scramble Documentation**: http://localhost:8080/docs/api
+- The documentation is automatically generated from your controller docblocks and type hints
+- **No manual configuration required** - just start coding your APIs!
+
+### Generating Documentation
+
+```bash
+# Generate API docs (runs automatically in development)
+php artisan scramble:docs
+```
+
+### 🔐 Authentication System (Ready to Use)
+
+The starter **includes a complete Laravel Sanctum authentication system** with these endpoints already implemented:
+
+- `POST /api/v1/register` - User registration
+- `POST /api/v1/login` - User login  
+- `POST /api/v1/logout` - User logout (requires authentication)
+
+**AuthController is fully implemented** in `app/Http/Controllers/Api/V1/AuthController.php` with:
+- Input validation
+- Password hashing
+- Token generation
+- Error handling
+- Standardized API responses
+
+### API Response Helper
+
+The project includes a custom `ApiResponse` helper class that provides:
+- Consistent JSON response formatting
+- Automatic error handling
+- Success/error status codes
+- Exception handling
+
+Example usage:
+```php
+return ApiResponse::handle(function() {
+    // Your logic here
+    return ['data' => 'success'];
+});
+```
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Run all tests
 php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/ExampleTest.php
+
+# Run tests with coverage
+php artisan test --coverage
 ```
 
-## License
+### Database Testing
 
-This project is released under MIT license. See file [LICENSE](LICENSE) for details. 
+The setup includes automatic test database configuration. Tests use the `testing` database which is automatically created and migrated.
+
+## 🐳 Services
+
+The Docker setup includes the following services:
+
+### Core Services
+
+- **laravel.test**: Main Laravel application with FrankenPHP
+- **mysql**: MySQL 8.0 database server
+- **redis**: Redis for caching and sessions
+
+### Development Services
+
+- **phpmyadmin**: Web-based MySQL administration
+- **mailpit**: Email testing and debugging
+- **meilisearch**: Full-text search engine
+
+### Service Health Checks
+
+All services include health checks to ensure proper startup order and availability.
+
+## 🚀 Deployment
+
+### Production Considerations
+
+1. **Environment Configuration:**
+   ```bash
+   APP_ENV=production
+   APP_DEBUG=false
+   OCTANE_SERVER=frankenphp
+   ```
+
+2. **Database:**
+   - Use managed database service
+   - Configure proper backup strategies
+   - Set up read replicas if needed
+
+3. **Caching:**
+   - Configure Redis for production
+   - Enable OPcache
+   - Use application-level caching
+
+4. **Security:**
+   - Update all secret keys
+   - Configure CORS properly
+   - Set up SSL/TLS certificates
+   - Enable rate limiting
+
+### Docker Production Setup
+
+```bash
+# Build production image
+docker-compose -f docker-compose.production.yml build
+
+# Deploy with production configuration
+docker-compose -f docker-compose.production.yml up -d
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow PSR-12 coding standards
+- Write tests for new features
+- Update documentation as needed
+- Use meaningful commit messages
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+1. **Port Conflicts:**
+   ```bash
+   # Check if ports are in use
+   lsof -i :8080
+   # Modify APP_PORT in .env if needed
+   ```
+
+2. **Permission Issues:**
+   ```bash
+   # Fix storage permissions
+   chmod -R 775 storage bootstrap/cache
+   ```
+
+3. **Database Connection:**
+   ```bash
+   # Check MySQL container logs
+   docker-compose logs mysql
+   
+   # Reset database
+   docker-compose down -v
+   docker-compose up -d
+   ```
+
+4. **Clear All Caches:**
+   ```bash
+   php artisan optimize:clear
+   php artisan config:clear
+   php artisan cache:clear
+   php artisan view:clear
+   ```
+
+### Performance Optimization
+
+- **Octane Memory Management**: Monitor memory usage and restart workers periodically
+- **Database Indexing**: Add proper indexes for frequently queried columns
+- **Caching Strategy**: Implement Redis caching for expensive operations
+- **Asset Optimization**: Use Vite's build process for production assets
+
+---
+
+**Built with ❤️ using Laravel, Octane, FrankenPHP, and Docker** 
