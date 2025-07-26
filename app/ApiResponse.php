@@ -20,10 +20,10 @@ class ApiResponse
      * @param callable $callback The function to execute and return its result as a JSON response
      *
      * @return \Illuminate\Http\JsonResponse A JSON response with standardized structure:
-     *         - On success: ['status' => 'success', 'data' => result] with 200 status code
-     *         - On validation error: ['status' => 'error', 'message' => '...', 'errors' => [...]] with 422 status code
-     *         - On resource not found: ['status' => 'error', 'message' => 'Resource not found'] with 404 status code
-     *         - On other exceptions: ['status' => 'error', 'message' => '...'] with 500 status code
+     *         - On success: ['status' => 'ok', 'data' => result] with 200 status code
+     *         - On validation error: ['status' => 'ko', 'message' => '...', 'errors' => [...]] with 422 status code
+     *         - On resource not found: ['status' => 'ko', 'message' => 'Resource not found'] with 404 status code
+     *         - On other exceptions: ['status' => 'ko', 'message' => '...'] with 500 status code
      *
      * @throws \Exception If an unexpected error occurs that isn't caught by the internal try-catch
      *
@@ -36,7 +36,7 @@ class ApiResponse
             $result = $callback();
 
             $response = [
-                'status' => 'success',
+                'status' => 'ok',
             ];
 
             if (is_string($result)) {
@@ -86,7 +86,7 @@ class ApiResponse
         
         if ($debug) {
             return response()->json([
-                'status' => 'error',
+                'status' => 'ko',
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
@@ -94,7 +94,7 @@ class ApiResponse
         }
         
         $response = [
-            'status' => 'error',
+            'status' => 'ko',
             'message' => $genericMessage,
         ];
         

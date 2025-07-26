@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\TestsController;
 use App\Http\Controllers\Api\V1\UsersController;
+use App\Http\Controllers\Api\V1\AdminsController;
 
 // USE THIS ROUTE FOR TESTING
 Route::get('/test', [TestsController::class, 'test']);
