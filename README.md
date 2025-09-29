@@ -60,7 +60,16 @@ No need for local PHP, MySQL, or other dependencies!
    cp .env.example .env
    ```
 
-3. **Start the development environment:**
+3. **Modify `.env` as needed:**
+
+4. **Run:**
+   ```bash
+   composer install
+   npm install
+   composer dump-autoload
+   php artisan config:clear
+   ```
+5. **Start the development environment:**
    ```bash
    ./run.sh
    ```
@@ -70,52 +79,25 @@ The `run.sh` script will:
 - Set proper permissions
 - Enter the container bash automatically
 
-4. **Install dependencies (inside the container):**
+6. **Install dependencies (inside the container):**
    ```bash
    composer install
    npm install
    ```
 
-5. **Generate application key and run migrations:**
+7. **Generate application key and run migrations:**
    ```bash
    php artisan key:generate
    php artisan migrate
    ```
 
    **Note:** The authentication system is ready to use immediately after migration! The included migrations set up:
-   - Users table with soft deletes
-   - Personal access tokens table (Sanctum)
-   - Admin user functionality
-   - Cache and jobs tables
+    - Users table with soft deletes
+    - Personal access tokens table (Sanctum)
+    - Admin user functionality
+    - Cache and jobs tables
 
 ## ⚙️ Configuration
-
-### Environment Variables
-
-Key configuration options in `.env`:
-
-```env
-# Application
-APP_NAME=your-app-name
-APP_PORT=8080
-APP_DEBUG=true
-
-# Database
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_DATABASE=your-database
-DB_USERNAME=root
-DB_PASSWORD=your-password
-
-# FrankenPHP/Octane
-OCTANE_SERVER=frankenphp
-
-# Ports
-PHPMYADMIN_PORT=3000
-FORWARD_DB_PORT=3306
-FORWARD_REDIS_PORT=6379
-FORWARD_MEILISEARCH_PORT=7700
-```
 
 ### FrankenPHP Configuration
 
@@ -200,7 +182,7 @@ The starter **includes a complete authentication system ready to use**:
 
 ✅ **Fully Implemented Features:**
 - User registration with validation
-- User login with credential verification  
+- User login with credential verification
 - User logout with token revocation
 - Laravel Sanctum token-based authentication
 - `ApiResponse` helper for consistent responses
@@ -252,7 +234,7 @@ php artisan scramble:docs
 The starter **includes a complete Laravel Sanctum authentication system** with these endpoints already implemented:
 
 - `POST /api/v1/register` - User registration
-- `POST /api/v1/login` - User login  
+- `POST /api/v1/login` - User login
 - `POST /api/v1/logout` - User logout (requires authentication)
 
 **AuthController is fully implemented** in `app/Http/Controllers/Api/V1/AuthController.php` with:
@@ -329,20 +311,20 @@ All services include health checks to ensure proper startup order and availabili
    ```
 
 2. **Database:**
-   - Use managed database service
-   - Configure proper backup strategies
-   - Set up read replicas if needed
+    - Use managed database service
+    - Configure proper backup strategies
+    - Set up read replicas if needed
 
 3. **Caching:**
-   - Configure Redis for production
-   - Enable OPcache
-   - Use application-level caching
+    - Configure Redis for production
+    - Enable OPcache
+    - Use application-level caching
 
 4. **Security:**
-   - Update all secret keys
-   - Configure CORS properly
-   - Set up SSL/TLS certificates
-   - Enable rate limiting
+    - Update all secret keys
+    - Configure CORS properly
+    - Set up SSL/TLS certificates
+    - Enable rate limiting
 
 ### Docker Production Setup
 
