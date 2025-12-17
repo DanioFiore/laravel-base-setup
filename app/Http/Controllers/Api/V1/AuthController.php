@@ -90,4 +90,11 @@ class AuthController extends Controller
             return 'Logged out successfully';
         });
     }
+
+    public function currentUser(): JsonResponse
+    {
+        return ApiResponse::handle(function() {
+            return Auth::user();
+        });
+    }
 }

@@ -16,15 +16,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     // AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'currentUser']);
 
-    // USERS
-    Route::get('/users', [UsersController::class, 'index']);
-    Route::get('/users/{id}', [UsersController::class, 'show']);
-    Route::patch('/users', [UsersController::class, 'update']);
-    Route::patch('/users/{id}/restore', [UsersController::class, 'restore']);
-    Route::delete('/users/{id}', [UsersController::class, 'softDestroy']);
-
-    // ADMINS
-    Route::get('/admins', [AdminsController::class, 'index']);
-    Route::patch('/admins/{id}', [AdminsController::class, 'update']);
+    // ADMINS MIDDLEWARE
+    Route::middleware('admin')->group(function () {
+        // USERS
+        Route::get('/users', [UsersController::class, 'index']);
+        Route::post('/users', [UsersController::class, 'store']);
+        Route::patch('/users/{id}/restore', [UsersController::class, 'restore']);
+        Route::delete('/users/{id}', [UsersController::class, 'softDestroy']);
+    });
 });
