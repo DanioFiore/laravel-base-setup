@@ -13,9 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function ($middleware) {
-        $middleware->throttle('api', 'api_requests_rate_limiter');
-    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
     })
